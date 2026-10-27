@@ -1,20 +1,48 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Hand Gesture AI
 
-# Run and deploy your AI Studio app
+An AI-powered web application for real-time hand gesture detection using a camera.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/dcb93276-ea08-4324-a125-c1fba52cad3e
+- Real-time hand gesture detection
+- Camera-based interaction
+- Hand landmark tracking
+- Interactive user interface
+
+## Technologies Used
+
+- React
+- TypeScript
+- Vite
+- MediaPipe Tasks Vision
+- CSS
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+### Prerequisites
 
+- Node.js
+- npm
+
+### Installation
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open the local URL shown in your terminal.
+
+## Security
+
+Do not upload `.env` files or API keys to GitHub. Use `.env.example` to document required environment variables without exposing secrets.
+
+
+
