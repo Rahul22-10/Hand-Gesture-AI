@@ -1,0 +1,6 @@
+{
+  "name": "Hand Gesture AI",
+  "description": "Real-time client-side hand gesture recognition using MediaPipe Hand Landmarker and computer vision geometry classification.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
