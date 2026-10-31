@@ -599,6 +599,8 @@ export default function App() {
               <GestureHistory
                 history={history}
                 onClearHistory={() => setHistory([])}
+                onDeleteItem={(id) => setHistory((prev) => prev.filter((item) => item.id !== id))}
+                onDeleteItems={(ids) => setHistory((prev) => prev.filter((item) => !ids.includes(item.id)))}
                 theme={theme}
               />
             </div>
@@ -618,26 +620,6 @@ export default function App() {
             </div>
           )}
         </main>
-
-        {/* Footer */}
-        <footer
-          className={`border-t py-6 mt-auto transition-colors ${
-            isDark ? 'bg-black border-neutral-800 text-neutral-500' : 'bg-white border-slate-200 text-slate-500'
-          }`}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-            <div>
-              Hand Gesture AI · Client-Side MediaPipe Hand Landmarker Vision Pipeline
-            </div>
-            <div className="flex items-center gap-4">
-              <span>21 3D Landmarks</span>
-              <span aria-hidden="true">·</span>
-              <span>10 Standard Gestures</span>
-              <span aria-hidden="true">·</span>
-              <span>Zero Server Latency</span>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   );

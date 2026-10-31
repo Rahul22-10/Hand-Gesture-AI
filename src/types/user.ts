@@ -8,6 +8,7 @@ export interface UserProfile {
   fullName: string;
   email: string;
   username: string;
+  password?: string;
   role: string;
   bio: string;
   avatarUrl: string; // base64 data URL from file or fallback avatar

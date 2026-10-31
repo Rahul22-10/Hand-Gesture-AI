@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Camera, CameraOff, Volume2, VolumeX, Sparkles, User, Menu, Moon, Sun } from 'lucide-react';
+import { Camera, CameraOff, Volume2, VolumeX, User, Menu, Moon, Sun } from 'lucide-react';
 import { UserProfile } from '../types/user';
 import { AppTheme } from '../types/theme';
 
@@ -63,15 +63,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          <div
-            className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-lg shadow-sm ${
-              isDark
-                ? 'bg-white text-black'
-                : 'bg-slate-900 text-white'
-            }`}
-          >
-            <Sparkles className="w-5 h-5 stroke-[2.5]" />
-          </div>
           <button
             onClick={() => setActiveTab('camera')}
             className={`text-lg font-bold tracking-tight whitespace-nowrap shrink-0 transition-colors text-left ${

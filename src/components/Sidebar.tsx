@@ -10,12 +10,9 @@ import {
   Layers,
   History,
   User,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
-  Moon,
-  Sun,
 } from 'lucide-react';
 import { UserProfile } from '../types/user';
 import { AppTheme } from '../types/theme';
@@ -90,17 +87,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             isDark ? 'border-neutral-800' : 'border-slate-200'
           }`}
         >
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold shrink-0 shadow-xs ${
-                isDark ? 'bg-white text-black' : 'bg-slate-900 text-white'
-              }`}
-            >
-              <Sparkles className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            {!isCollapsed && (
+          <div className="flex items-center overflow-hidden">
+            {!isCollapsed ? (
               <span className="text-sm font-bold tracking-tight whitespace-nowrap truncate">
                 Hand Gesture AI
+              </span>
+            ) : (
+              <span className="text-xs font-mono font-bold tracking-tight text-neutral-400">
+                HGAI
               </span>
             )}
           </div>
@@ -228,58 +222,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Sidebar Footer: Clean Black / White BG Switcher */}
-      <div className={`p-3 border-t ${isDark ? 'border-neutral-800' : 'border-slate-200'} space-y-2.5`}>
-        {!isCollapsed && (
-          <div>
-            <div className={`text-[10px] uppercase font-mono tracking-wider mb-1.5 px-1 ${isDark ? 'text-neutral-500' : 'text-slate-400'}`}>
-              Background Theme
-            </div>
-            <div
-              className={`grid grid-cols-2 gap-1 p-1 rounded-xl border text-xs font-medium ${
-                isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-slate-100 border-slate-200'
-              }`}
-            >
-              <button
-                type="button"
-                onClick={() => onChangeTheme('black')}
-                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  isDark
-                    ? 'bg-black text-white font-bold shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                <Moon className="w-3.5 h-3.5" />
-                <span>Black</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onChangeTheme('white')}
-                className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  !isDark
-                    ? 'bg-white text-slate-900 font-bold shadow-xs'
-                    : 'text-neutral-400 hover:text-white'
-                }`}
-              >
-                <Sun className="w-3.5 h-3.5 text-amber-500" />
-                <span>White</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className={`px-2 text-[10px] font-mono text-center truncate ${isDark ? 'text-neutral-500' : 'text-slate-400'}`}>
-          {isCollapsed ? (
-            <button
-              onClick={() => onChangeTheme(isDark ? 'white' : 'black')}
-              title={`Switch to ${isDark ? 'White' : 'Black'} BG`}
-              className="p-1 rounded hover:bg-neutral-800 cursor-pointer"
-            >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
-            </button>
-          ) : (
-            'MediaPipe Vision · Client AI'
-          )}
+      {/* Sidebar Footer */}
+      <div className={`p-3 border-t ${isDark ? 'border-neutral-800' : 'border-slate-200'}`}>
+        <div className={`px-2 py-1 text-[10px] font-mono text-center truncate ${isDark ? 'text-neutral-500' : 'text-slate-400'}`}>
+          {!isCollapsed ? 'MediaPipe Vision · Client AI' : 'HGAI'}
         </div>
       </div>
     </aside>
