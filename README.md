@@ -40,14 +40,18 @@ An AI-powered web application for real-time hand gesture detection using a camer
 
 3. Open the local URL shown in your terminal.
 
-## Security
-
-Do not upload `.env` files or API keys to GitHub. Use `.env.example` to document required environment variables without exposing secrets.
-
-4. 🌐 Live Demo
+4.4. 🌐 Live Demo
 
 Try Hand Gesture AI Live:
 🚀 Open Live Website
 https://hand-gesture-ai-gamma.vercel.app/
+
+
+
+
+## Security
+
+Do not upload `.env` files or API keys to GitHub. Use `.env.example` to document required environment variables without exposing secrets.
+
 
 
