@@ -40,7 +40,7 @@ An AI-powered web application for real-time hand gesture detection using a camer
 
 3. Open the local URL shown in your terminal.
 
-4.4. 🌐 Live Demo
+4. 🌐 Live Demo
 
 Try Hand Gesture AI Live:
 🚀 Open Live Website
