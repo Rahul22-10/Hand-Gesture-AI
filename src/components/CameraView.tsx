@@ -14,6 +14,7 @@ import {
   RefreshCw,
   AlertTriangle,
   Download,
+  ExternalLink,
 } from 'lucide-react';
 import { HandDetectionResult } from '../types/gestures';
 import { RenderOptions } from '../utils/canvasRenderer';
@@ -91,36 +92,33 @@ export const CameraView: React.FC<CameraViewProps> = ({
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(() => {});
+      containerRef.current.requestFullscreen().catch(() => { });
     } else {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   };
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full rounded-2xl overflow-hidden flex flex-col border transition-colors ${
-        isDark
-          ? 'bg-[#0c0c0e] border-neutral-800 text-white shadow-xl'
-          : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-      }`}
+      className={`relative w-full rounded-2xl overflow-hidden flex flex-col border transition-colors ${isDark
+        ? 'bg-[#0c0c0e] border-neutral-800 text-white shadow-xl'
+        : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+        }`}
     >
       {/* Top HUD Controls Bar */}
       <div
-        className={`flex items-center justify-between px-4 py-3 border-b text-xs ${
-          isDark
-            ? 'bg-black border-neutral-800 text-neutral-300'
-            : 'bg-slate-50 border-slate-200 text-slate-700'
-        }`}
+        className={`flex items-center justify-between px-4 py-3 border-b text-xs ${isDark
+          ? 'bg-black border-neutral-800 text-neutral-300'
+          : 'bg-slate-50 border-slate-200 text-slate-700'
+          }`}
       >
         {/* Left: Status & Telemetry */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span
-              className={`w-2 h-2 rounded-full ${
-                isStreaming ? 'bg-emerald-500 animate-pulse' : isDark ? 'bg-neutral-600' : 'bg-slate-400'
-              }`}
+              className={`w-2 h-2 rounded-full ${isStreaming ? 'bg-emerald-500 animate-pulse' : isDark ? 'bg-neutral-600' : 'bg-slate-400'
+                }`}
             />
             <span className="font-mono font-medium">
               {isStreaming
@@ -133,9 +131,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
           {isStreaming && (
             <div
-              className={`hidden sm:flex items-center gap-2 font-mono ${
-                isDark ? 'text-neutral-500' : 'text-slate-400'
-              }`}
+              className={`hidden sm:flex items-center gap-2 font-mono ${isDark ? 'text-neutral-500' : 'text-slate-400'
+                }`}
             >
               <span aria-hidden="true">·</span>
               <span className={`tabular-nums ${isDark ? 'text-neutral-200' : 'text-slate-700'}`}>
@@ -153,15 +150,14 @@ export const CameraView: React.FC<CameraViewProps> = ({
             type="button"
             onClick={onToggleVoice}
             title={voiceEnabled ? 'Voice Speech (Speaks gesture name out loud): ACTIVE' : 'Voice Speech: MUTED'}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${
-              voiceEnabled
-                ? isDark
-                  ? 'bg-neutral-800 text-emerald-400 border-neutral-700'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold'
-                : isDark
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${voiceEnabled
+              ? isDark
+                ? 'bg-neutral-800 text-emerald-400 border-neutral-700'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold'
+              : isDark
                 ? 'bg-neutral-900 text-neutral-500 border-neutral-800'
                 : 'bg-slate-100 text-slate-400 border-slate-200'
-            }`}
+              }`}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${voiceEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-neutral-500'}`} />
             <span className="hidden sm:inline">{voiceEnabled ? 'Voice: ON' : 'Voice: OFF'}</span>
@@ -178,15 +174,14 @@ export const CameraView: React.FC<CameraViewProps> = ({
                   }))
                 }
                 title={renderOptions.isMirrored ? 'Disable mirror mode' : 'Enable mirror mode'}
-                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  renderOptions.isMirrored
-                    ? isDark
-                      ? 'bg-neutral-800 text-white border-neutral-700'
-                      : 'bg-slate-200 text-slate-900 border-slate-300'
-                    : isDark
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${renderOptions.isMirrored
+                  ? isDark
+                    ? 'bg-neutral-800 text-white border-neutral-700'
+                    : 'bg-slate-200 text-slate-900 border-slate-300'
+                  : isDark
                     ? 'bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white'
                     : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <FlipHorizontal className="w-3.5 h-3.5" />
               </button>
@@ -201,15 +196,14 @@ export const CameraView: React.FC<CameraViewProps> = ({
                   }))
                 }
                 title={renderOptions.showSkeleton ? 'Hide hand skeleton' : 'Show hand skeleton'}
-                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  renderOptions.showSkeleton
-                    ? isDark
-                      ? 'bg-neutral-800 text-white border-neutral-700'
-                      : 'bg-slate-200 text-slate-900 border-slate-300'
-                    : isDark
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${renderOptions.showSkeleton
+                  ? isDark
+                    ? 'bg-neutral-800 text-white border-neutral-700'
+                    : 'bg-slate-200 text-slate-900 border-slate-300'
+                  : isDark
                     ? 'bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white'
                     : 'bg-white text-slate-500 border-slate-200 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 {renderOptions.showSkeleton ? (
                   <Eye className="w-3.5 h-3.5" />
@@ -222,11 +216,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
                 type="button"
                 onClick={handleSnapshot}
                 title="Save snapshot image"
-                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  isDark
-                    ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
-                    : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${isDark
+                  ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
+                  : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
               >
                 <Download className="w-3.5 h-3.5" />
               </button>
@@ -237,11 +230,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
             type="button"
             onClick={toggleFullscreen}
             title="Toggle fullscreen preview"
-            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-              isDark
-                ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
-                : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
+            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${isDark
+              ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
+              : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
@@ -250,9 +242,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
       {/* Main Video & Canvas Viewport */}
       <div
-        className={`relative aspect-[16/10] sm:aspect-[16/9] w-full flex items-center justify-center overflow-hidden ${
-          isDark ? 'bg-black' : 'bg-slate-900'
-        }`}
+        className={`relative aspect-[16/10] sm:aspect-[16/9] w-full flex items-center justify-center overflow-hidden ${isDark ? 'bg-black' : 'bg-slate-900'
+          }`}
       >
         {/* Hidden / Underlying Video Feed */}
         <video
@@ -260,28 +251,25 @@ export const CameraView: React.FC<CameraViewProps> = ({
           autoPlay
           playsInline
           muted
-          className={`absolute inset-0 w-full h-full object-contain pointer-events-none transition-opacity duration-300 ${
-            isStreaming ? 'opacity-100' : 'opacity-0'
-          } ${renderOptions.isMirrored ? 'scale-x-[-1]' : ''}`}
+          className={`absolute inset-0 w-full h-full object-contain pointer-events-none transition-opacity duration-300 ${isStreaming ? 'opacity-100' : 'opacity-0'
+            } ${renderOptions.isMirrored ? 'scale-x-[-1]' : ''}`}
         />
 
         {/* Live Vector Landmarks Canvas Overlay */}
         <canvas
           ref={canvasRef}
-          className={`absolute inset-0 w-full h-full object-contain pointer-events-none z-10 transition-opacity duration-300 ${
-            isStreaming ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute inset-0 w-full h-full object-contain pointer-events-none z-10 transition-opacity duration-300 ${isStreaming ? 'opacity-100' : 'opacity-0'
+            }`}
         />
 
         {/* Standby State: When camera is not active */}
         {!isStreaming && !isLoadingModel && !error && (
           <div className="flex flex-col items-center justify-center p-8 text-center max-w-md z-20">
             <div
-              className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-5 shadow-lg ${
-                isDark
-                  ? 'bg-neutral-900 border-neutral-800 text-white'
-                  : 'bg-white border-slate-200 text-slate-900'
-              }`}
+              className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-5 shadow-lg ${isDark
+                ? 'bg-neutral-900 border-neutral-800 text-white'
+                : 'bg-white border-slate-200 text-slate-900'
+                }`}
             >
               <Camera className="w-8 h-8" />
             </div>
@@ -289,17 +277,28 @@ export const CameraView: React.FC<CameraViewProps> = ({
             <p className="text-sm text-neutral-300 mb-6 leading-relaxed">
               Activate your camera to begin real-time gesture recognition. Detection runs 100% locally on your device via MediaPipe WebAssembly.
             </p>
-            <button
-              onClick={onStartCamera}
-              className={`px-6 py-3 text-sm font-semibold rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer ${
-                isDark
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={onStartCamera}
+                className={`px-6 py-3 text-sm font-semibold rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer ${isDark
                   ? 'bg-white text-black hover:bg-neutral-200'
                   : 'bg-white text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              Enable Camera & Start Tracking
-            </button>
+                  }`}
+              >
+                <Camera className="w-4 h-4" />
+                Enable Camera & Start Tracking
+              </button>
+              <a
+                href="http://localhost:3002"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-3 text-xs font-semibold rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white"
+                title="If viewing inside VS Code, open in Google Chrome or Edge for full webcam hardware access"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Open in Chrome / Browser
+              </a>
+            </div>
           </div>
         )}
 
@@ -327,15 +326,26 @@ export const CameraView: React.FC<CameraViewProps> = ({
             <div className="text-xs text-neutral-400 text-left space-y-1.5 mb-6 max-w-sm">
               <p>• Verify you allowed camera permissions in your browser address bar.</p>
               <p>• Ensure another program (Zoom, Teams, etc.) is not locking the webcam.</p>
-              <p>• For secure context, HTTPS or localhost is required.</p>
+              <p>• For secure camera access, please ensure camera permission is enabled in your browser.</p>
             </div>
-            <button
-              onClick={onStartCamera}
-              className="px-5 py-2.5 text-xs font-semibold text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-all border border-neutral-700 flex items-center gap-2 cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Retry Camera Permission
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={onStartCamera}
+                className="px-5 py-2.5 text-xs font-semibold text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-all border border-neutral-700 flex items-center gap-2 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Retry Camera Permission
+              </button>
+              <a
+                href="http://localhost:3002"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all shadow flex items-center gap-2 cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Open in Chrome / Browser
+              </a>
+            </div>
           </div>
         )}
 
@@ -349,11 +359,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
       {/* Bottom Bar: Action buttons */}
       <div
-        className={`flex flex-wrap items-center justify-between gap-4 px-5 py-3.5 border-t ${
-          isDark
-            ? 'bg-black border-neutral-800 text-neutral-400'
-            : 'bg-slate-50 border-slate-200 text-slate-500'
-        }`}
+        className={`flex flex-wrap items-center justify-between gap-4 px-5 py-3.5 border-t ${isDark
+          ? 'bg-black border-neutral-800 text-neutral-400'
+          : 'bg-slate-50 border-slate-200 text-slate-500'
+          }`}
       >
         <div className="flex items-center gap-3 text-xs">
           <span>Engine: MediaPipe HandLandmarker</span>
@@ -375,11 +384,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
           ) : (
             <button
               onClick={onStartCamera}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all shadow-xs flex items-center gap-2 cursor-pointer ${
-                isDark
-                  ? 'bg-white text-black hover:bg-neutral-200'
-                  : 'bg-slate-900 text-white hover:bg-slate-800'
-              }`}
+              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all shadow-xs flex items-center gap-2 cursor-pointer ${isDark
+                ? 'bg-white text-black hover:bg-neutral-200'
+                : 'bg-slate-900 text-white hover:bg-slate-800'
+                }`}
             >
               <Camera className="w-3.5 h-3.5" />
               Start Camera

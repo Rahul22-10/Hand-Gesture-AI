@@ -6,18 +6,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { UserProfile } from '../types/user';
 import {
-  Camera,
-  Upload,
   User,
   Mail,
   Lock,
   Eye,
   EyeOff,
-  Sparkles,
   CheckCircle2,
-  ArrowRight,
-  ShieldCheck,
-  KeyRound,
+  ArrowLeft,
+  Camera,
+  Upload,
 } from 'lucide-react';
 import { AppTheme } from '../types/theme';
 
@@ -28,6 +25,246 @@ interface AuthOnboardingModalProps {
 }
 
 type AuthMode = 'login' | 'register' | 'forgot_password';
+
+// ─── Module-Level Subcomponents (STABLE REFERENCES, PREVENTS FOCUS LOSS) ──────
+
+interface InputFieldProps {
+  icon: React.ElementType;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  rightElement?: React.ReactNode;
+  isDark: boolean;
+  autoComplete?: string;
+}
+
+const InputField: React.FC<InputFieldProps> = ({
+  icon: Icon,
+  type,
+  value,
+  onChange,
+  placeholder,
+  rightElement,
+  isDark,
+  autoComplete,
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputBg = isDark ? '#262626' : '#f3f4f6';
+  const inputBorder = isFocused
+    ? '1px solid #22c55e'
+    : isDark ? '1px solid #333' : '1px solid transparent';
+  const inputColor = isDark ? '#ffffff' : '#111827';
+  const subtitleColor = isDark ? '#9ca3af' : '#6b7280';
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <Icon
+        size={17}
+        style={{
+          position: 'absolute',
+          left: '14px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: subtitleColor,
+          pointerEvents: 'none',
+        }}
+      />
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        style={{
+          width: '100%',
+          backgroundColor: inputBg,
+          border: inputBorder,
+          borderRadius: '14px',
+          padding: '14px 16px 14px 44px',
+          paddingRight: rightElement ? '44px' : '16px',
+          fontSize: '14px',
+          color: inputColor,
+          outline: 'none',
+          boxShadow: isFocused ? '0 0 0 2.5px rgba(34,197,94,0.35)' : 'none',
+          transition: 'box-shadow 0.2s, border-color 0.2s',
+        }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      />
+      {rightElement && (
+        <div style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)' }}>
+          {rightElement}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const EyeToggle: React.FC<{ show: boolean; toggle: () => void; isDark?: boolean }> = ({
+  show,
+  toggle,
+  isDark,
+}) => (
+  <button
+    type="button"
+    onClick={toggle}
+    tabIndex={-1}
+    style={{
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      color: isDark ? '#9ca3af' : '#6b7280',
+      padding: 0,
+      display: 'flex',
+    }}
+  >
+    {show ? <EyeOff size={17} /> : <Eye size={17} />}
+  </button>
+);
+
+const BackButton: React.FC<{ onClick: () => void; isDark: boolean }> = ({ onClick, isDark }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    style={{
+      width: '36px',
+      height: '36px',
+      borderRadius: '50%',
+      backgroundColor: isDark ? '#262626' : '#f3f4f6',
+      border: isDark ? '1px solid #333' : '1px solid transparent',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      color: isDark ? '#9ca3af' : '#6b7280',
+      marginBottom: '20px',
+      transition: 'background-color 0.2s',
+    }}
+  >
+    <ArrowLeft size={16} />
+  </button>
+);
+
+const PillButton: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit';
+}> = ({ children, onClick, type = 'button' }) => (
+  <button
+    type={type}
+    onClick={onClick}
+    style={{
+      width: '100%',
+      backgroundColor: '#22c55e',
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '50px',
+      padding: '15px 24px',
+      fontSize: '15px',
+      fontWeight: '700',
+      cursor: 'pointer',
+      letterSpacing: '0.01em',
+      transition: 'background-color 0.2s, transform 0.1s',
+      marginTop: '4px',
+    }}
+    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#16a34a'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#22c55e'; }}
+  >
+    {children}
+  </button>
+);
+
+const SocialSection: React.FC<{ isDark: boolean }> = ({ isDark }) => {
+  const dividerColor = isDark ? '#2a2a2a' : '#e5e7eb';
+  const subtitleColor = isDark ? '#9ca3af' : '#6b7280';
+  const socialBtnBg = isDark ? '#262626' : '#ffffff';
+  const socialBtnBorder = isDark ? '1px solid #333' : '1px solid #e5e7eb';
+  const socialBtnShadow = isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.08)';
+
+  return (
+    <div style={{ marginTop: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ flex: 1, height: '1px', backgroundColor: dividerColor }} />
+        <span style={{ fontSize: '12px', color: subtitleColor, whiteSpace: 'nowrap' }}>
+          Or Continue With Account
+        </span>
+        <div style={{ flex: 1, height: '1px', backgroundColor: dividerColor }} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+        <button
+          type="button"
+          title="Continue with Facebook"
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            backgroundColor: socialBtnBg,
+            border: socialBtnBorder,
+            boxShadow: socialBtnShadow,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '20px',
+            fontWeight: '900',
+            color: '#1877F2',
+            transition: 'transform 0.15s',
+          }}
+        >
+          f
+        </button>
+        <button
+          type="button"
+          title="Continue with Google"
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            backgroundColor: socialBtnBg,
+            border: socialBtnBorder,
+            boxShadow: socialBtnShadow,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.15s',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          title="Continue with Apple"
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            backgroundColor: socialBtnBg,
+            border: socialBtnBorder,
+            boxShadow: socialBtnShadow,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.15s',
+          }}
+        >
+          <svg width="18" height="20" viewBox="0 0 814 1000" fill={isDark ? '#ffffff' : '#000000'}>
+            <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.3-152.8-91.3c-57.6-65.1-109-170-109-269.8 0-174.6 112.3-266.6 222.5-266.6 73.4 0 134.4 48.4 170.3 48.4 34.5 0 102.8-51.4 183.9-51.4zm-93.6-200.9c35.9-45.3 61.6-110 61.6-174.6 0-8.3-.6-16.6-2-23.5-57.6 2.6-135.4 39.5-180.1 103.1-32.5 42.1-64.5 108.2-64.5 172.9 0 9.6 1.3 19.2 1.9 22.4 4.5.7 11.5 1.3 18.5 1.3 51.4 0 125.7-35.3 164.6-101.6z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── Main AuthOnboardingModal Component ──────────────────────────────────────
 
 export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
   isOpen,
@@ -49,9 +286,10 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
   const [registerPassword, setRegisterPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState('Computer Vision Specialist');
   const [preferredHand, setPreferredHand] = useState<'Right' | 'Left' | 'Both'>('Right');
-  const [avatarUrl, setAvatarUrl] = useState<string>(''); // Photo is NOT compulsory
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
 
   // Forgot Password state
   const [forgotEmail, setForgotEmail] = useState('');
@@ -64,7 +302,6 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isDark = theme === 'black';
 
-  // Clear errors when switching modes
   useEffect(() => {
     setError(null);
     setNotification(null);
@@ -73,32 +310,26 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
 
   if (!isOpen) return null;
 
+  // ─── Helpers ────────────────────────────────────────────────────────────────
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setFullName(val);
-    const slug = val
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]/g, '');
-    if (slug && !username) {
-      setUsername(slug);
-    }
+    const slug = val.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+    if (slug && !username) setUsername(slug);
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith('image/')) {
       setError('Please upload a valid image file (JPEG, PNG, WebP).');
       return;
     }
-
     if (file.size > 8 * 1024 * 1024) {
       setError('Image file must be under 8MB.');
       return;
     }
-
     setError(null);
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
@@ -110,55 +341,35 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
         let w = img.width;
         let h = img.height;
         if (w > h) {
-          if (w > maxDim) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          }
+          if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
         } else {
-          if (h > maxDim) {
-            h = Math.round((h * maxDim) / h);
-            h = maxDim;
-          }
+          if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
         }
-        canvas.width = w;
-        canvas.height = h;
+        canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h);
-          setAvatarUrl(canvas.toDataURL('image/jpeg', 0.85));
-        } else {
-          setAvatarUrl(src);
-        }
+        if (ctx) { ctx.drawImage(img, 0, 0, w, h); setAvatarUrl(canvas.toDataURL('image/jpeg', 0.85)); }
+        else setAvatarUrl(src);
       };
       img.src = src;
     };
     reader.readAsDataURL(file);
   };
 
-  // Generate fallback SVG/Canvas avatar when photo is omitted (photo is NOT compulsory)
   const generateDefaultAvatar = (name: string) => {
     const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
+    canvas.width = 128; canvas.height = 128;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#1c1c1c';
-      ctx.fillRect(0, 0, 128, 128);
-
-      ctx.strokeStyle = '#555555';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(2, 2, 124, 124);
-
-      const initials =
-        name
-          .split(' ')
-          .map((p) => p[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2) || 'HG';
-
+      const grad = ctx.createLinearGradient(0, 0, 128, 128);
+      grad.addColorStop(0, '#22c55e');
+      grad.addColorStop(1, '#16a34a');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(64, 64, 64, 0, Math.PI * 2);
+      ctx.fill();
+      const initials = name.split(' ').map((p) => p[0]).join('').toUpperCase().slice(0, 2) || 'HG';
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 44px sans-serif';
+      ctx.font = 'bold 48px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(initials, 64, 65);
@@ -167,122 +378,76 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
     return '';
   };
 
-  // Handle Login Submission
+  // ─── Form Handlers ──────────────────────────────────────────────────────────
+
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
     const identifier = loginIdentifier.trim();
     const pwd = loginPassword.trim();
+    if (!identifier) { setError('Please enter your username or email.'); return; }
+    if (!pwd) { setError('Please enter your password.'); return; }
 
-    if (!identifier) {
-      setError('Please enter your username or email.');
-      return;
-    }
-    if (!pwd) {
-      setError('Please enter your password.');
-      return;
-    }
-
-    // Check stored registered users list
-    let registeredUsers: UserProfile[] = [];
     try {
       const stored = localStorage.getItem('hand_gesture_registered_users');
-      if (stored) {
-        registeredUsers = JSON.parse(stored) as UserProfile[];
-      }
-    } catch {
-      registeredUsers = [];
-    }
+      const registeredUsers: UserProfile[] = stored ? JSON.parse(stored) : [];
+      const match = registeredUsers.find(
+        (u) =>
+          (u.email.toLowerCase() === identifier.toLowerCase() ||
+           u.username.toLowerCase() === identifier.toLowerCase()) &&
+          u.password === pwd
+      );
 
-    const matched = registeredUsers.find(
-      (u) =>
-        u.email.toLowerCase() === identifier.toLowerCase() ||
-        u.username.toLowerCase() === identifier.toLowerCase()
-    );
-
-    if (matched) {
-      if (matched.password && matched.password !== pwd) {
-        setError('Incorrect password. Click "Forgot password?" to reset.');
+      if (match) {
+        onComplete(match);
         return;
       }
-      onComplete(matched);
-      return;
-    }
+    } catch { /* ignore */ }
 
-    // Generate dynamic authenticated profile for entered credentials
-    const date = new Date();
+    // Fallback: If no match found in stored list, log in with demo/entered credentials
     const cleanName = identifier.includes('@')
       ? identifier.split('@')[0].replace(/[._-]/g, ' ')
       : identifier;
-    const formattedName =
-      cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-
-    const dynamicProfile: UserProfile = {
-      id: `HGAI-${date.getFullYear()}-${Math.random().toString(16).substring(2, 6).toUpperCase()}`,
-      fullName: formattedName,
-      email: identifier.includes('@') ? identifier.toLowerCase() : `${identifier.toLowerCase()}@gesture.ai`,
-      username: identifier.toLowerCase().replace(/[^a-z0-9_]/g, ''),
+    const displayName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    const fallbackProfile: UserProfile = {
+      id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
+      fullName: displayName || 'Authenticated User',
+      email: identifier.includes('@') ? identifier.toLowerCase() : `${identifier.toLowerCase()}@gesturedemo.ai`,
+      username: identifier.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase() || 'user',
       password: pwd,
       role: 'Computer Vision Specialist',
-      bio: 'Practitioner using real-time hand gesture recognition AI.',
-      avatarUrl: generateDefaultAvatar(formattedName),
-      createdAt: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      bio: 'Ready to perform real-time hand gesture recognition with local client-side biometric inference.',
+      avatarUrl: generateDefaultAvatar(displayName || 'User'),
+      createdAt: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       createdAtTimestamp: Date.now(),
       preferredHand: 'Right',
       skillLevel: 'Practitioner',
       accountStatus: 'Active',
     };
 
-    try {
-      registeredUsers.push(dynamicProfile);
-      localStorage.setItem('hand_gesture_registered_users', JSON.stringify(registeredUsers));
-    } catch {
-      // ignore
-    }
-
-    onComplete(dynamicProfile);
+    onComplete(fallbackProfile);
   };
 
-  // Handle Registration Submission (Photo NOT compulsory, all others required)
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Required fields check: "All required ..but photo not compulsory"
-    if (!fullName.trim()) {
-      setError('Full Name is required.');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setError('A valid Email address is required.');
-      return;
-    }
-    if (!username.trim()) {
-      setError('Username handle is required.');
-      return;
-    }
-    if (!registerPassword) {
-      setError('Password is required.');
-      return;
-    }
-    if (registerPassword.length < 4) {
-      setError('Password must be at least 4 characters long.');
-      return;
-    }
-    if (confirmPassword && registerPassword !== confirmPassword) {
-      setError('Passwords do not match. Please re-enter.');
-      return;
-    }
+    if (!fullName.trim()) { setError('Full Name is required.'); return; }
+    if (!email.trim() || !email.includes('@')) { setError('Please enter a valid email address.'); return; }
+    if (!username.trim() || username.length < 3) { setError('Username must be at least 3 characters.'); return; }
+    if (!registerPassword) { setError('Password is required.'); return; }
+    if (registerPassword.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    if (registerPassword !== confirmPassword) { setError('Passwords do not match.'); return; }
 
-    // Photo is NOT compulsory: use uploaded photo or auto-generate
-    const finalAvatar = avatarUrl || generateDefaultAvatar(fullName);
+    const now = new Date();
+    const monthYear = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const finalAvatar = avatarUrl || generateDefaultAvatar(fullName.trim());
+    const generatedId = `USR-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const date = new Date();
-    const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    const randomHex = Math.random().toString(16).substring(2, 6).toUpperCase();
-    const generatedId = `HGAI-${date.getFullYear()}-${randomHex}`;
-    const autoBio = `${role} analyzing hand gestures with client-side MediaPipe vision.`;
+    const autoBio =
+      role === 'Computer Vision Specialist'
+        ? `Computer Vision Specialist specializing in hand landmark geometry and real-time gesture pipelines.`
+        : `Active member utilizing client-side MediaPipe gesture tracking and biometric control.`;
 
     const newProfile: UserProfile = {
       id: generatedId,
@@ -305,764 +470,475 @@ export const AuthOnboardingModal: React.FC<AuthOnboardingModalProps> = ({
       const registeredUsers: UserProfile[] = stored ? JSON.parse(stored) : [];
       registeredUsers.push(newProfile);
       localStorage.setItem('hand_gesture_registered_users', JSON.stringify(registeredUsers));
-    } catch {
-      // ignore
-    }
+    } catch { /* ignore */ }
 
     onComplete(newProfile);
   };
 
-  // Handle Forgot Password
   const handleForgotSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!forgotEmail.trim()) {
-      setError('Please enter your email or username to recover password.');
-      return;
-    }
-
+    if (!forgotEmail.trim()) { setError('Please enter your email or username to recover password.'); return; }
     setError(null);
     setForgotSuccess(true);
-    setNotification(
-      `Password reset instructions have been sent to ${forgotEmail}. Please check your inbox.`
-    );
+    setNotification(`Password reset instructions have been sent to ${forgotEmail}. Please check your inbox.`);
   };
 
+  // ─── Theme tokens ────────────────────────────────────────────────────────────
+  const cardBg = isDark ? '#1a1a1a' : '#ffffff';
+  const inputBg = isDark ? '#262626' : '#f3f4f6';
+  const inputBorder = isDark ? '1px solid #333' : '1px solid transparent';
+  const labelColor = isDark ? '#d1d5db' : '#374151';
+  const subtitleColor = isDark ? '#9ca3af' : '#6b7280';
+  const headingColor = isDark ? '#ffffff' : '#111827';
+  const cardShadow = isDark
+    ? '0 25px 60px rgba(0,0,0,0.8)'
+    : '0 25px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)';
+  const secondaryTextColor = isDark ? '#6b7280' : '#6b7280';
+  const green = '#22c55e';
+  const greenLight = isDark ? 'rgba(34,197,94,0.15)' : '#dcfce7';
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto ${
-        isDark ? 'bg-black/90' : 'bg-black/75'
-      }`}
-      style={{ fontFamily: 'var(--font-sans)' }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: isDark ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(8px)',
+        overflowY: 'auto',
+      }}
     >
+      {/* Card */}
       <div
-        className="relative w-full max-w-md my-8 rounded-2xl border overflow-hidden transition-all duration-200 shadow-2xl"
         style={{
-          backgroundColor: '#0a0a0a',
-          borderColor: '#555555',
-          color: '#ffffff',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9), 0 0 0 1px #555555',
+          position: 'relative',
+          width: '100%',
+          maxWidth: '400px',
+          backgroundColor: cardBg,
+          borderRadius: '28px',
+          padding: '32px 28px',
+          boxShadow: cardShadow,
+          margin: '24px auto',
         }}
       >
-        {/* Top Accent Line in simple black #555555 */}
-        <div
-          className="h-1 w-full"
-          style={{ backgroundColor: '#555555' }}
-        />
-
-        {/* Modal Header */}
-        <div className="p-6 sm:p-7 pb-4">
-          <div className="flex items-center justify-between mb-4">
-            {/* Logo / Title */}
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-inner"
-                style={{
-                  backgroundColor: '#161616',
-                  borderColor: '#555555',
-                  color: '#ffffff',
-                }}
-              >
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold tracking-tight text-white">
-                  Hand Gesture AI
-                </h2>
-                <p className="text-xs" style={{ color: '#888888' }}>
-                  Client-Side Vision System
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mode Switcher Tabs (Login vs Register) */}
+        {/* Error Banner */}
+        {error && (
           <div
-            className="grid grid-cols-2 p-1 rounded-xl border mb-2"
             style={{
-              backgroundColor: '#121212',
-              borderColor: '#555555',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fca5a5',
+              borderRadius: '12px',
+              padding: '12px 14px',
+              marginBottom: '16px',
+              fontSize: '13px',
+              color: '#dc2626',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
             }}
           >
-            <button
-              type="button"
-              onClick={() => setAuthMode('login')}
-              className="py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              style={
-                authMode === 'login'
-                  ? {
-                      backgroundColor: '#555555',
-                      color: '#ffffff',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
-                    }
-                  : {
-                      backgroundColor: 'transparent',
-                      color: '#888888',
-                    }
-              }
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Login</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAuthMode('register')}
-              className="py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              style={
-                authMode === 'register'
-                  ? {
-                      backgroundColor: '#555555',
-                      color: '#ffffff',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
-                    }
-                  : {
-                      backgroundColor: 'transparent',
-                      color: '#888888',
-                    }
-              }
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Register</span>
-            </button>
+            <span style={{ fontWeight: 700, flexShrink: 0 }}>!</span>
+            <span>{error}</span>
           </div>
-        </div>
+        )}
 
-        {/* Feedback / Alert Banners */}
-        <div className="px-6 sm:px-7">
-          {error && (
-            <div
-              className="mb-4 p-3 rounded-xl border text-xs font-medium flex items-start gap-2"
+        {/* Success Banner */}
+        {notification && (
+          <div
+            style={{
+              backgroundColor: greenLight,
+              border: `1px solid ${green}66`,
+              borderRadius: '12px',
+              padding: '12px 14px',
+              marginBottom: '16px',
+              fontSize: '13px',
+              color: isDark ? '#86efac' : '#15803d',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+            }}
+          >
+            <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
+            <span>{notification}</span>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* LOGIN */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {authMode === 'login' && (
+          <form onSubmit={handleLoginSubmit}>
+            {/* Heading */}
+            <h2
               style={{
-                backgroundColor: '#2a0e0e',
-                borderColor: '#882222',
-                color: '#ff9999',
+                fontSize: '30px', fontWeight: '800', color: headingColor,
+                textAlign: 'center', marginBottom: '8px', letterSpacing: '-0.5px',
               }}
             >
-              <span className="shrink-0 font-bold">!</span>
-              <span>{error}</span>
+              Log in
+            </h2>
+            <p style={{ textAlign: 'center', color: subtitleColor, fontSize: '13px', marginBottom: '28px', lineHeight: '1.5' }}>
+              Enter your email and password to securely access<br />your account and manage your services.
+            </p>
+
+            {/* Email */}
+            <div style={{ marginBottom: '12px' }}>
+              <InputField
+                icon={Mail}
+                type="text"
+                value={loginIdentifier}
+                onChange={(e) => setLoginIdentifier(e.target.value)}
+                placeholder="Email address"
+                isDark={isDark}
+                autoComplete="username"
+              />
             </div>
-          )}
 
-          {notification && (
-            <div
-              className="mb-4 p-3 rounded-xl border text-xs font-medium flex items-start gap-2"
-              style={{
-                backgroundColor: '#142214',
-                borderColor: '#555555',
-                color: '#bbf7d0',
-              }}
-            >
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
-              <span>{notification}</span>
+            {/* Password */}
+            <div style={{ marginBottom: '14px' }}>
+              <InputField
+                icon={Lock}
+                type={showLoginPassword ? 'text' : 'password'}
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="Password"
+                isDark={isDark}
+                autoComplete="current-password"
+                rightElement={
+                  <EyeToggle
+                    show={showLoginPassword}
+                    toggle={() => setShowLoginPassword((p) => !p)}
+                    isDark={isDark}
+                  />
+                }
+              />
             </div>
-          )}
-        </div>
 
-        {/* Content Body */}
-        <div className="px-6 sm:px-7 pb-6">
-          {/* ========================================================================= */}
-          {/* 1. LOGIN MODE */}
-          {/* ========================================================================= */}
-          {authMode === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              {/* Field 1: Login Box (Username or Email) */}
-              <div>
-                <label
-                  className="block text-xs font-semibold mb-1.5"
-                  style={{ color: '#cccccc' }}
-                >
-                  Username or Email <span style={{ color: '#ef4444' }}>*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="Enter your username or email"
-                    className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-xs border focus:outline-none transition-all placeholder:text-neutral-500"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 1px #ffffff';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#555555';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  />
-                  <User
-                    className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                    style={{ color: '#555555' }}
-                  />
-                </div>
-              </div>
-
-              {/* Field 2: Password Box */}
-              <div>
-                <label
-                  className="block text-xs font-semibold mb-1.5"
-                  style={{ color: '#cccccc' }}
-                >
-                  Password <span style={{ color: '#ef4444' }}>*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type={showLoginPassword ? 'text' : 'password'}
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full rounded-xl px-3.5 py-2.5 pl-10 pr-10 text-xs border focus:outline-none transition-all placeholder:text-neutral-500"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 1px #ffffff';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#555555';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  />
-                  <Lock
-                    className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                    style={{ color: '#555555' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword((prev) => !prev)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                    title={showLoginPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showLoginPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Field 3: SIMPLE BOX UNDER LOGIN BOX AND PASSWORD BOX */}
-              <div
-                className="p-3.5 rounded-xl border transition-colors"
-                style={{
-                  backgroundColor: '#141414',
-                  borderColor: '#555555',
-                }}
-              >
-                <div className="flex items-center justify-between text-xs">
-                  {/* Remember Me Checkbox */}
-                  <label className="inline-flex items-center gap-2 cursor-pointer select-none text-neutral-300 hover:text-white">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded cursor-pointer accent-[#555555]"
-                    />
-                    <span className="text-[12px]">Remember login</span>
-                  </label>
-
-                  {/* Forgot Password Button */}
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode('forgot_password')}
-                    className="text-[12px] font-semibold transition-all cursor-pointer hover:underline flex items-center gap-1"
-                    style={{ color: '#ffffff' }}
-                  >
-                    <KeyRound className="w-3.5 h-3.5" style={{ color: '#555555' }} />
-                    <span>Forgot password?</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
+            {/* Remember me + Forgot */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '7px', cursor: 'pointer', fontSize: '13px', color: labelColor }}>
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  style={{ width: '15px', height: '15px', accentColor: green, cursor: 'pointer' }}
+                />
+                Remember me
+              </label>
               <button
-                type="submit"
-                className="w-full py-3 px-4 text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1"
-                style={{
-                  backgroundColor: '#555555',
-                  color: '#ffffff',
-                  border: '1px solid #777777',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#666666';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#555555';
-                }}
+                type="button"
+                onClick={() => setAuthMode('forgot_password')}
+                style={{ background: 'none', border: 'none', color: labelColor, fontSize: '13px', fontWeight: '600', cursor: 'pointer', padding: 0 }}
               >
-                <span>Login to Hand Gesture AI</span>
-                <ArrowRight className="w-4 h-4" />
+                Forgot Password
               </button>
+            </div>
 
-              {/* Switch to Register link */}
-              <div className="text-center pt-2">
-                <span className="text-xs" style={{ color: '#888888' }}>
-                  Don't have an account?{' '}
-                </span>
+            {/* Login Button */}
+            <PillButton type="submit">Login</PillButton>
+
+            {/* Sign up link */}
+            <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: secondaryTextColor }}>
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => setAuthMode('register')}
+                style={{ background: 'none', border: 'none', color: green, fontWeight: '700', cursor: 'pointer', fontSize: '13px', padding: 0 }}
+              >
+                Sign Up here
+              </button>
+            </p>
+
+            {/* Social */}
+            <SocialSection isDark={isDark} />
+          </form>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* REGISTER */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {authMode === 'register' && (
+          <form onSubmit={handleRegisterSubmit}>
+            {/* Back */}
+            <BackButton onClick={() => setAuthMode('login')} isDark={isDark} />
+
+            {/* Heading */}
+            <h2
+              style={{
+                fontSize: '28px', fontWeight: '800', color: headingColor,
+                textAlign: 'center', marginBottom: '8px', letterSpacing: '-0.5px',
+              }}
+            >
+              Create Account
+            </h2>
+            <p style={{ textAlign: 'center', color: subtitleColor, fontSize: '13px', marginBottom: '24px', lineHeight: '1.5' }}>
+              Create a new account to get started and enjoy<br />seamless access to our features.
+            </p>
+
+            {/* Avatar Upload (optional) */}
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', gap: '14px',
+                backgroundColor: inputBg,
+                borderRadius: '14px', padding: '12px 14px',
+                marginBottom: '12px',
+              }}
+            >
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div
+                  style={{
+                    width: '50px', height: '50px', borderRadius: '50%',
+                    overflow: 'hidden',
+                    backgroundColor: isDark ? '#333' : '#e5e7eb',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: `2px solid ${green}44`,
+                  }}
+                >
+                  {avatarUrl
+                    ? <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <User size={22} style={{ color: subtitleColor }} />}
+                </div>
                 <button
                   type="button"
-                  onClick={() => setAuthMode('register')}
-                  className="text-xs font-bold hover:underline cursor-pointer"
-                  style={{ color: '#ffffff' }}
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    position: 'absolute', bottom: '-2px', right: '-2px',
+                    width: '20px', height: '20px', borderRadius: '50%',
+                    backgroundColor: green, border: '2px solid ' + cardBg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                  title="Upload photo"
                 >
-                  Register here
+                  <Camera size={10} color="#fff" />
                 </button>
               </div>
-            </form>
-          )}
-
-          {/* ========================================================================= */}
-          {/* 2. REGISTER MODE (All required, but photo NOT compulsory) */}
-          {/* ========================================================================= */}
-          {authMode === 'register' && (
-            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-              {/* Photo Box: Clearly marked NOT COMPULSORY */}
-              <div
-                className="p-3 rounded-xl border flex items-center gap-3.5"
-                style={{
-                  backgroundColor: '#121212',
-                  borderColor: '#555555',
-                }}
-              >
-                <div className="relative shrink-0">
-                  <div
-                    className="w-14 h-14 rounded-full overflow-hidden border-2 flex items-center justify-center shadow-md"
-                    style={{
-                      backgroundColor: '#181818',
-                      borderColor: '#555555',
-                    }}
-                  >
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt="Profile preview"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-6 h-6 text-neutral-400" />
-                    )}
-                  </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: headingColor, marginBottom: '2px' }}>
+                  Profile Photo
+                  <span style={{ fontSize: '10px', fontWeight: '500', color: subtitleColor, marginLeft: '6px' }}>
+                    Optional
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center shadow transition-all cursor-pointer border"
-                    style={{
-                      backgroundColor: '#555555',
-                      borderColor: '#777777',
-                      color: '#ffffff',
-                    }}
-                    title="Upload profile photo"
+                    style={{ background: 'none', border: 'none', color: green, fontSize: '12px', fontWeight: '600', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '3px' }}
                   >
-                    <Camera className="w-3.5 h-3.5" />
+                    <Upload size={11} />
+                    {avatarUrl ? 'Change' : 'Upload'}
                   </button>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-white">
-                      Profile Photo
-                    </span>
-                    <span
-                      className="text-[10px] font-mono px-1.5 py-0.2 rounded border font-medium"
-                      style={{
-                        backgroundColor: '#1a1a1a',
-                        borderColor: '#555555',
-                        color: '#aaaaaa',
-                      }}
-                    >
-                      Photo not compulsory
-                    </span>
-                  </div>
-                  <p className="text-[11px] mt-0.5" style={{ color: '#888888' }}>
-                    Optional — if skipped, a personalized avatar is generated automatically.
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
+                  {avatarUrl && (
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-[11px] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-                      style={{ color: '#ffffff' }}
+                      onClick={() => setAvatarUrl('')}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '12px', fontWeight: '600', cursor: 'pointer', padding: 0 }}
                     >
-                      <Upload className="w-3 h-3" />
-                      {avatarUrl ? 'Change image' : 'Choose file'}
+                      Remove
                     </button>
-                    {avatarUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setAvatarUrl('')}
-                        className="text-[11px] text-rose-400 hover:underline cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
               </div>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+            </div>
 
-              {/* Full Name (Required) */}
-              <div>
-                <label
-                  className="block text-xs font-semibold mb-1"
-                  style={{ color: '#cccccc' }}
-                >
-                  Full Name <span style={{ color: '#ef4444' }}>*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={handleNameChange}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-xl px-3.5 py-2 pl-9 text-xs border focus:outline-none transition-all"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
+            {/* Name */}
+            <div style={{ marginBottom: '12px' }}>
+              <InputField
+                icon={User}
+                type="text"
+                value={fullName}
+                onChange={handleNameChange}
+                placeholder="Name"
+                isDark={isDark}
+                autoComplete="name"
+              />
+            </div>
+
+            {/* Email */}
+            <div style={{ marginBottom: '12px' }}>
+              <InputField
+                icon={Mail}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                isDark={isDark}
+                autoComplete="email"
+              />
+            </div>
+
+            {/* Password */}
+            <div style={{ marginBottom: '12px' }}>
+              <InputField
+                icon={Lock}
+                type={showRegisterPassword ? 'text' : 'password'}
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
+                placeholder="Password"
+                isDark={isDark}
+                autoComplete="new-password"
+                rightElement={
+                  <EyeToggle
+                    show={showRegisterPassword}
+                    toggle={() => setShowRegisterPassword((p) => !p)}
+                    isDark={isDark}
                   />
-                  <User
-                    className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                    style={{ color: '#555555' }}
+                }
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div style={{ marginBottom: '12px' }}>
+              <InputField
+                icon={Lock}
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm Password"
+                isDark={isDark}
+                autoComplete="new-password"
+                rightElement={
+                  <EyeToggle
+                    show={showConfirmPassword}
+                    toggle={() => setShowConfirmPassword((p) => !p)}
+                    isDark={isDark}
                   />
-                </div>
-              </div>
+                }
+              />
+            </div>
 
-              {/* Email Address (Required) */}
-              <div>
-                <label
-                  className="block text-xs font-semibold mb-1"
-                  style={{ color: '#cccccc' }}
-                >
-                  Email Address <span style={{ color: '#ef4444' }}>*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    className="w-full rounded-xl px-3.5 py-2 pl-9 text-xs border focus:outline-none transition-all"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
-                  />
-                  <Mail
-                    className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                    style={{ color: '#555555' }}
-                  />
-                </div>
-              </div>
-
-              {/* Username & Password Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Username Box */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold mb-1"
-                    style={{ color: '#cccccc' }}
-                  >
-                    Username <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Choose a username"
-                    className="w-full rounded-xl px-3 py-2 text-xs border focus:outline-none transition-all"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
-                  />
-                </div>
-
-                {/* Password Box */}
-                <div>
-                  <label
-                    className="block text-xs font-semibold mb-1"
-                    style={{ color: '#cccccc' }}
-                  >
-                    Password <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showRegisterPassword ? 'text' : 'password'}
-                      required
-                      value={registerPassword}
-                      onChange={(e) => setRegisterPassword(e.target.value)}
-                      placeholder="Create a password"
-                      className="w-full rounded-xl px-3 py-2 pr-8 text-xs border focus:outline-none transition-all"
-                      style={{
-                        backgroundColor: '#121212',
-                        borderColor: '#555555',
-                        color: '#ffffff',
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowRegisterPassword((prev) => !prev)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      {showRegisterPassword ? (
-                        <EyeOff className="w-3.5 h-3.5" />
-                      ) : (
-                        <Eye className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Role & Hand Preference (Required) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label
-                    className="block text-xs font-semibold mb-1"
-                    style={{ color: '#cccccc' }}
-                  >
-                    Role / Domain <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    required
-                    className="w-full rounded-xl px-3 py-2 text-xs border focus:outline-none transition-all cursor-pointer"
-                    style={{
-                      backgroundColor: '#121212',
-                      borderColor: '#555555',
-                      color: '#ffffff',
-                    }}
-                  >
-                    <option value="Computer Vision Specialist">CV Specialist</option>
-                    <option value="AI / ML Engineer">AI/ML Engineer</option>
-                    <option value="Software Developer">Software Developer</option>
-                    <option value="Student / Researcher">Researcher</option>
-                    <option value="Gesture Enthusiast">Gesture Enthusiast</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    className="block text-xs font-semibold mb-1"
-                    style={{ color: '#cccccc' }}
-                  >
-                    Primary Hand <span style={{ color: '#ef4444' }}>*</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-1">
-                    {(['Right', 'Left', 'Both'] as const).map((hand) => (
-                      <button
-                        type="button"
-                        key={hand}
-                        onClick={() => setPreferredHand(hand)}
-                        className="py-1.5 px-2 rounded-lg border text-xs font-medium transition-all cursor-pointer"
-                        style={
-                          preferredHand === hand
-                            ? {
-                                backgroundColor: '#555555',
-                                borderColor: '#777777',
-                                color: '#ffffff',
-                                fontWeight: 'bold',
-                              }
-                            : {
-                                backgroundColor: '#141414',
-                                borderColor: '#333333',
-                                color: '#888888',
-                              }
-                        }
-                      >
-                        {hand}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Notice that all is required, but photo is optional */}
-              <div
-                className="p-2.5 rounded-xl border text-[11px] flex items-center gap-2"
-                style={{
-                  backgroundColor: '#141414',
-                  borderColor: '#555555',
-                  color: '#aaaaaa',
-                }}
-              >
-                <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                <span>
-                  All fields required. Profile photo is completely optional.
-                </span>
-              </div>
-
-              {/* Submit Registration */}
-              <button
-                type="submit"
-                className="w-full py-3 px-4 text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1"
-                style={{
-                  backgroundColor: '#555555',
-                  color: '#ffffff',
-                  border: '1px solid #777777',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#666666';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#555555';
-                }}
-              >
-                <span>Complete Registration & Launch</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              {/* Switch to Login */}
-              <div className="text-center pt-1">
-                <span className="text-xs" style={{ color: '#888888' }}>
-                  Already have an account?{' '}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('login')}
-                  className="text-xs font-bold hover:underline cursor-pointer"
-                  style={{ color: '#ffffff' }}
-                >
-                  Sign In
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ========================================================================= */}
-          {/* 3. FORGOT PASSWORD MODE */}
-          {/* ========================================================================= */}
-          {authMode === 'forgot_password' && (
-            <div className="space-y-4">
-              <div className="text-center pb-1">
-                <div
-                  className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center border mb-2"
+            {/* Role + Hand (compact row) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   style={{
-                    backgroundColor: '#161616',
-                    borderColor: '#555555',
+                    width: '100%',
+                    backgroundColor: inputBg,
+                    border: inputBorder,
+                    borderRadius: '14px',
+                    padding: '14px 12px',
+                    fontSize: '12px',
+                    color: isDark ? '#ffffff' : '#111827',
+                    outline: 'none',
+                    cursor: 'pointer',
                   }}
                 >
-                  <KeyRound className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-sm font-bold text-white">Reset Password</h3>
-                <p className="text-xs mt-1" style={{ color: '#888888' }}>
-                  Enter your email address or username to recover access to your account.
-                </p>
+                  <option value="Computer Vision Specialist">CV Specialist</option>
+                  <option value="AI / ML Engineer">AI/ML Engineer</option>
+                  <option value="Software Developer">Developer</option>
+                  <option value="Student / Researcher">Researcher</option>
+                  <option value="Gesture Enthusiast">Enthusiast</option>
+                </select>
               </div>
 
-              {!forgotSuccess ? (
-                <form onSubmit={handleForgotSubmit} className="space-y-3.5">
-                  <div>
-                    <label
-                      className="block text-xs font-semibold mb-1.5"
-                      style={{ color: '#cccccc' }}
-                    >
-                      Email or Username <span style={{ color: '#ef4444' }}>*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        value={forgotEmail}
-                        onChange={(e) => setForgotEmail(e.target.value)}
-                        placeholder="Enter your email address or username"
-                        className="w-full rounded-xl px-3.5 py-2.5 pl-10 text-xs border focus:outline-none transition-all"
-                        style={{
-                          backgroundColor: '#121212',
-                          borderColor: '#555555',
-                          color: '#ffffff',
-                        }}
-                      />
-                      <Mail
-                        className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                        style={{ color: '#555555' }}
-                      />
-                    </div>
-                  </div>
-
+              {/* Primary hand toggle */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', alignItems: 'center' }}>
+                {(['Right', 'Left', 'Both'] as const).map((hand) => (
                   <button
-                    type="submit"
-                    className="w-full py-2.5 px-4 text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                    style={{
-                      backgroundColor: '#555555',
-                      color: '#ffffff',
-                      border: '1px solid #777777',
-                    }}
-                  >
-                    Send Reset Instructions
-                  </button>
-
-                  <button
+                    key={hand}
                     type="button"
-                    onClick={() => setAuthMode('login')}
-                    className="w-full py-2 px-4 text-xs font-semibold rounded-xl transition-all cursor-pointer border"
+                    onClick={() => setPreferredHand(hand)}
                     style={{
-                      backgroundColor: 'transparent',
-                      borderColor: '#555555',
-                      color: '#cccccc',
+                      padding: '8px 4px',
+                      borderRadius: '10px',
+                      fontSize: '11px',
+                      fontWeight: preferredHand === hand ? '700' : '500',
+                      cursor: 'pointer',
+                      border: 'none',
+                      backgroundColor: preferredHand === hand ? green : inputBg,
+                      color: preferredHand === hand ? '#fff' : subtitleColor,
+                      transition: 'all 0.15s',
                     }}
                   >
-                    Cancel and Return to Login
+                    {hand}
                   </button>
-                </form>
-              ) : (
-                <div className="space-y-3.5 text-center">
-                  <div
-                    className="p-3.5 rounded-xl border text-xs"
-                    style={{
-                      backgroundColor: '#142014',
-                      borderColor: '#555555',
-                      color: '#bbf7d0',
-                    }}
-                  >
-                    <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
-                    <p className="font-semibold">Reset Instructions Sent</p>
-                    <p className="text-[11px] text-neutral-300 mt-1">
-                      Please check your email inbox for password recovery instructions.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode('login')}
-                    className="w-full py-2.5 px-4 text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                    style={{
-                      backgroundColor: '#555555',
-                      color: '#ffffff',
-                      border: '1px solid #777777',
-                    }}
-                  >
-                    Return to Login
-                  </button>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Create Account Button */}
+            <PillButton type="submit">Create Account</PillButton>
+
+            {/* Sign In link */}
+            <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: secondaryTextColor }}>
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => setAuthMode('login')}
+                style={{ background: 'none', border: 'none', color: green, fontWeight: '700', cursor: 'pointer', fontSize: '13px', padding: 0 }}
+              >
+                Sign In here
+              </button>
+            </p>
+
+            {/* Social */}
+            <SocialSection isDark={isDark} />
+          </form>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* FORGOT PASSWORD */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {authMode === 'forgot_password' && (
+          <div>
+            {/* Back */}
+            <BackButton onClick={() => setAuthMode('login')} isDark={isDark} />
+
+            {/* Heading */}
+            <h2
+              style={{
+                fontSize: '28px', fontWeight: '800', color: headingColor,
+                textAlign: 'center', marginBottom: '8px', letterSpacing: '-0.5px',
+              }}
+            >
+              Forgot Password
+            </h2>
+            <p style={{ textAlign: 'center', color: subtitleColor, fontSize: '13px', marginBottom: '28px', lineHeight: '1.5' }}>
+              Enter your email address to receive a reset link and<br />regain access to your account.
+            </p>
+
+            {!forgotSuccess ? (
+              <form onSubmit={handleForgotSubmit}>
+                <div style={{ marginBottom: '20px' }}>
+                  <InputField
+                    icon={Mail}
+                    type="text"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Email address"
+                    isDark={isDark}
+                    autoComplete="email"
+                  />
+                </div>
+                <PillButton type="submit">Continue</PillButton>
+              </form>
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    backgroundColor: greenLight,
+                    border: `1px solid ${green}66`,
+                    borderRadius: '14px',
+                    padding: '20px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <CheckCircle2 size={32} style={{ color: green, margin: '0 auto 8px' }} />
+                  <p style={{ fontWeight: '700', color: headingColor, fontSize: '14px', marginBottom: '4px' }}>Reset Instructions Sent</p>
+                  <p style={{ color: subtitleColor, fontSize: '12px' }}>
+                    Please check your email inbox for password recovery instructions.
+                  </p>
+                </div>
+                <PillButton onClick={() => setAuthMode('login')}>Return to Login</PillButton>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

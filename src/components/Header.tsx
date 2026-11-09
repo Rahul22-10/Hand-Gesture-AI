@@ -22,6 +22,14 @@ interface HeaderProps {
   onToggleSidebar?: () => void;
 }
 
+const NAV_TABS = [
+  { id: 'camera' as const, label: 'Camera', dot: '#22c55e' },
+  { id: 'guide' as const, label: 'Guide', dot: '#a855f7' },
+  { id: 'landmarks' as const, label: '3D Nodes', dot: '#38bdf8' },
+  { id: 'history' as const, label: 'History', dot: '#f97316' },
+  { id: 'profile' as const, label: 'Profile', dot: '#f43f5e' },
+];
+
 export const Header: React.FC<HeaderProps> = ({
   isStreaming,
   onStartCamera,
@@ -37,232 +45,246 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isDark = theme === 'black';
 
+  const headerBg = isDark ? 'rgba(8,8,8,0.92)' : 'rgba(255,255,255,0.92)';
+  const headerBorder = isDark ? '#1f1f1f' : '#e5e7eb';
+  const textColor = isDark ? '#ffffff' : '#111827';
+  const mutedColor = isDark ? '#555555' : '#9ca3af';
+  const btnIdle = isDark ? '#161616' : '#f3f4f6';
+  const btnIdleBorder = isDark ? '#2a2a2a' : '#e5e7eb';
+
   return (
     <header
-      className={`sticky top-0 z-30 transition-colors duration-200 border-b ${
-        isDark
-          ? 'bg-black/90 backdrop-blur-md border-neutral-800 text-white'
-          : 'bg-white/90 backdrop-blur-md border-slate-200 text-slate-900 shadow-xs'
-      }`}
+      style={{
+        position: 'sticky', top: 0, zIndex: 30,
+        backgroundColor: headerBg,
+        backdropFilter: 'blur(14px)',
+        borderBottom: `1px solid ${headerBorder}`,
+        transition: 'background-color 0.2s',
+      }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Zone 1: Brand Wordmark & Mobile Sidebar Toggle */}
-        <div className="flex items-center gap-3 shrink-0">
+      <div
+        style={{
+          maxWidth: '1280px', margin: '0 auto',
+          padding: '0 16px',
+          height: '60px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+        }}
+      >
+        {/* ── Zone 1: Brand ─────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          {/* Mobile sidebar toggle */}
           {onToggleSidebar && (
             <button
               type="button"
               onClick={onToggleSidebar}
-              className={`lg:hidden p-2 rounded-lg border transition-colors ${
-                isDark
-                  ? 'text-neutral-400 hover:text-white hover:bg-neutral-900 border-neutral-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'
-              }`}
-              title="Toggle Menu Sidebar"
+              className="lg:hidden"
+              style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                backgroundColor: btnIdle, border: `1px solid ${btnIdleBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: mutedColor,
+              }}
+              title="Toggle sidebar"
             >
-              <Menu className="w-4 h-4" />
+              <Menu size={16} />
             </button>
           )}
 
+          {/* Logo + wordmark */}
           <button
             onClick={() => setActiveTab('camera')}
-            className={`text-lg font-bold tracking-tight whitespace-nowrap shrink-0 transition-colors text-left ${
-              isDark ? 'text-white hover:text-neutral-300' : 'text-slate-900 hover:text-slate-700'
-            }`}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}
           >
-            Hand Gesture AI
+            <span
+              style={{
+                fontSize: '22px', lineHeight: 1,
+                filter: 'drop-shadow(0 1px 6px #22c55e88)',
+              }}
+            >
+              ✋
+            </span>
+            <span
+              style={{
+                fontSize: '15px', fontWeight: 800, letterSpacing: '-0.3px',
+                color: textColor, whiteSpace: 'nowrap',
+              }}
+            >
+              Hand Gesture AI
+            </span>
           </button>
         </div>
 
-        {/* Zone 2: Navigation Links */}
+        {/* ── Zone 2: Nav tabs (desktop) ─────────────────────────────────── */}
         <nav
-          className={`hidden xl:flex items-center gap-7 text-sm font-medium ${
-            isDark ? 'text-neutral-400' : 'text-slate-600'
-          }`}
+          className="hidden xl:flex"
+          style={{ alignItems: 'center', gap: '2px' }}
         >
-          <button
-            onClick={() => setActiveTab('camera')}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === 'camera'
-                ? isDark
-                  ? 'text-white font-semibold'
-                  : 'text-slate-900 font-semibold'
-                : isDark
-                ? 'hover:text-white'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Camera & Detection
-          </button>
-          <button
-            onClick={() => setActiveTab('guide')}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === 'guide'
-                ? isDark
-                  ? 'text-white font-semibold'
-                  : 'text-slate-900 font-semibold'
-                : isDark
-                ? 'hover:text-white'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Gesture Guide (10)
-          </button>
-          <button
-            onClick={() => setActiveTab('landmarks')}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === 'landmarks'
-                ? isDark
-                  ? 'text-white font-semibold'
-                  : 'text-slate-900 font-semibold'
-                : isDark
-                ? 'hover:text-white'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            3D Landmarks
-          </button>
-          <button
-            onClick={() => setActiveTab('history')}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === 'history'
-                ? isDark
-                  ? 'text-white font-semibold'
-                  : 'text-slate-900 font-semibold'
-                : isDark
-                ? 'hover:text-white'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Recognition History
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === 'profile'
-                ? isDark
-                  ? 'text-white font-semibold'
-                  : 'text-slate-900 font-semibold'
-                : isDark
-                ? 'hover:text-white'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            My Profile
-          </button>
+          {NAV_TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 14px', borderRadius: '10px', border: 'none',
+                  fontSize: '13px', fontWeight: isActive ? 700 : 500,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  backgroundColor: isActive ? (isDark ? tab.dot + '20' : tab.dot + '15') : 'transparent',
+                  color: isActive ? tab.dot : mutedColor,
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.color = textColor;
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.color = mutedColor;
+                }}
+              >
+                {isActive && (
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    backgroundColor: tab.dot, flexShrink: 0,
+                    boxShadow: `0 0 6px ${tab.dot}`,
+                    animation: tab.id === 'camera' && isStreaming ? 'pulse 1s infinite' : 'none',
+                  }} />
+                )}
+                {tab.label}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Zone 3: Primary Action & Controls */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          {/* User Profile Quick Button in Header */}
-          {profile && (
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`flex items-center gap-2 p-1 sm:px-2.5 sm:py-1 rounded-xl border transition-all cursor-pointer ${
-                activeTab === 'profile'
-                  ? isDark
-                    ? 'bg-neutral-800 border-neutral-600 text-white'
-                    : 'bg-slate-100 border-slate-300 text-slate-900'
-                  : isDark
-                  ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-neutral-700'
-                  : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-              }`}
-              title="View My Profile"
-            >
-              <div
-                className={`w-6 h-6 rounded-lg overflow-hidden border flex items-center justify-center shrink-0 ${
-                  isDark ? 'bg-black border-neutral-700' : 'bg-slate-100 border-slate-300'
-                }`}
-              >
-                {profile.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt={profile.fullName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-3.5 h-3.5" />
-                )}
-              </div>
-              <span className="text-xs font-semibold hidden md:inline truncate max-w-[100px]">
-                {profile.fullName.split(' ')[0]}
-              </span>
-            </button>
-          )}
+        {/* ── Zone 3: Controls ───────────────────────────────────────────── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
 
-          {/* Simple Black BG / White BG Toggle Button */}
-          <div
-            className={`flex items-center p-0.5 rounded-lg border text-xs font-medium ${
-              isDark
-                ? 'bg-neutral-900 border-neutral-800 text-neutral-300'
-                : 'bg-slate-100 border-slate-200 text-slate-600'
-            }`}
+          {/* Profile avatar button */}
+          <button
+            onClick={() => setActiveTab('profile')}
+            title="My Profile"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '5px 10px 5px 5px',
+              borderRadius: '12px',
+              border: `1.5px solid ${activeTab === 'profile' ? '#f43f5e88' : btnIdleBorder}`,
+              backgroundColor: activeTab === 'profile' ? '#f43f5e18' : btnIdle,
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
           >
+            <div style={{
+              width: '26px', height: '26px', borderRadius: '8px', overflow: 'hidden',
+              border: `1.5px solid ${isDark ? '#333' : '#e5e7eb'}`,
+              backgroundColor: isDark ? '#1a1a1a' : '#f0f0f0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              {profile?.avatarUrl
+                ? <img src={profile.avatarUrl} alt={profile.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <User size={13} color={mutedColor} />}
+            </div>
+            <span
+              className="hidden md:inline"
+              style={{ fontSize: '12px', fontWeight: 600, color: textColor, maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {profile ? profile.fullName.split(' ')[0] : 'Profile'}
+            </span>
+          </button>
+
+          {/* Theme toggle pill */}
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            backgroundColor: isDark ? '#111' : '#f3f4f6',
+            border: `1px solid ${btnIdleBorder}`,
+            borderRadius: '10px', padding: '3px',
+          }}>
             <button
               type="button"
               onClick={() => onChangeTheme('black')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                isDark
-                  ? 'bg-neutral-800 text-white font-semibold shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-              title="Switch to Black Background"
+              title="Dark theme"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                padding: '5px 10px', borderRadius: '8px', border: 'none',
+                fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                backgroundColor: isDark ? '#222' : 'transparent',
+                color: isDark ? '#fff' : mutedColor,
+                boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+                transition: 'all 0.15s',
+              }}
             >
-              <Moon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Black</span>
+              <Moon size={13} />
+              <span className="hidden sm:inline">Dark</span>
             </button>
             <button
               type="button"
               onClick={() => onChangeTheme('white')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                !isDark
-                  ? 'bg-white text-slate-900 font-semibold shadow-xs'
-                  : 'text-neutral-400 hover:text-white'
-              }`}
-              title="Switch to White Background"
+              title="Light theme"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                padding: '5px 10px', borderRadius: '8px', border: 'none',
+                fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                backgroundColor: !isDark ? '#fff' : 'transparent',
+                color: !isDark ? '#111' : mutedColor,
+                boxShadow: !isDark ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.15s',
+              }}
             >
-              <Sun className="w-3.5 h-3.5 text-amber-500" />
-              <span className="hidden sm:inline">White</span>
+              <Sun size={13} color={!isDark ? '#f59e0b' : mutedColor} />
+              <span className="hidden sm:inline">Light</span>
             </button>
           </div>
 
-          {/* Sound Toggle */}
+          {/* Sound toggle */}
           <button
             type="button"
             onClick={onToggleSound}
-            aria-label={soundEnabled ? 'Mute audio blip' : 'Enable audio blip'}
-            title={soundEnabled ? 'Audio feedback enabled' : 'Audio feedback muted'}
-            className={`p-2 rounded-lg transition-colors border ${
-              isDark
-                ? 'text-neutral-400 hover:text-white hover:bg-neutral-900 border-neutral-800'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'
-            }`}
+            title={soundEnabled ? 'Mute sound' : 'Enable sound'}
+            style={{
+              width: '36px', height: '36px', borderRadius: '10px',
+              backgroundColor: btnIdle, border: `1px solid ${btnIdleBorder}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', color: soundEnabled ? textColor : mutedColor,
+              transition: 'all 0.15s',
+            }}
           >
-            {soundEnabled ? (
-              <Volume2 className={`w-4 h-4 ${isDark ? 'text-white' : 'text-slate-900'}`} />
-            ) : (
-              <VolumeX className="w-4 h-4" />
-            )}
+            {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
           </button>
 
-          {/* Start/Stop Camera */}
+          {/* Camera CTA */}
           {isStreaming ? (
             <button
               onClick={onStopCamera}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs font-semibold tracking-wide text-rose-600 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 transition-all whitespace-nowrap shrink-0 dark:bg-rose-500/15 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/25 cursor-pointer"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '10px',
+                fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                backgroundColor: '#dc262618', border: '1px solid #dc262644',
+                color: '#f87171', whiteSpace: 'nowrap',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#dc262630'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#dc262618'; }}
             >
-              <CameraOff className="w-3.5 h-3.5" />
+              <CameraOff size={14} />
               <span className="hidden sm:inline">Stop Camera</span>
             </button>
           ) : (
             <button
               onClick={onStartCamera}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs font-semibold tracking-wide rounded-lg transition-all shadow-xs whitespace-nowrap shrink-0 cursor-pointer ${
-                isDark
-                  ? 'bg-white text-black hover:bg-neutral-200'
-                  : 'bg-slate-900 text-white hover:bg-slate-800'
-              }`}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '10px', border: 'none',
+                fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                color: '#fff', whiteSpace: 'nowrap',
+                boxShadow: '0 2px 10px #22c55e44',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px #22c55e66'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 2px 10px #22c55e44'; }}
             >
-              <Camera className="w-3.5 h-3.5" />
+              <Camera size={14} />
               <span className="hidden sm:inline">Start Camera</span>
             </button>
           )}

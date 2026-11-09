@@ -171,11 +171,19 @@ export default function App() {
 
   // Frame processing loop
   const processFrame = useCallback(() => {
+    if (!isStreaming) {
+      return;
+    }
+
+    // Always schedule next animation frame continuously while isStreaming
+    animFrameIdRef.current = requestAnimationFrame(processFrame);
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const landmarker = landmarkerRef.current;
 
-    if (!video || !canvas || !landmarker || !isStreaming) {
+    // Wait until video and model are ready
+    if (!video || !canvas || !landmarker) {
       return;
     }
 
@@ -297,10 +305,6 @@ export default function App() {
         console.warn('Frame detection warning:', detectErr);
       }
     }
-
-    if (isStreaming) {
-      animFrameIdRef.current = requestAnimationFrame(processFrame);
-    }
   }, [isStreaming, renderOptions, soundEnabled, voiceEnabled]);
 
   // Animation frame loop
@@ -322,54 +326,105 @@ export default function App() {
     };
   }, [isStreaming, processFrame]);
 
+  // Ensure video element receives stream whenever camera tab or video ref mounts
+  useEffect(() => {
+    if (isStreaming && streamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      if (video.srcObject !== streamRef.current) {
+        video.srcObject = streamRef.current;
+        video.onloadedmetadata = () => {
+          video.play().catch(() => {});
+        };
+      }
+      video.play().catch(() => {});
+    }
+  }, [isStreaming, activeTab]);
+
   // Start Camera handler
   const startCamera = async () => {
     setCameraError(null);
-    setIsLoadingModel(true);
-    setModelProgressText('Initializing MediaPipe Vision Engine...');
+
+    // Switch to camera tab immediately so video viewport is visible and mounted
+    if (activeTab !== 'camera') {
+      setActiveTab('camera');
+    }
 
     try {
-      const landmarker = await initializeHandLandmarker((msg) => {
-        setModelProgressText(msg);
-      });
-      landmarkerRef.current = landmarker;
-
-      setModelProgressText('Requesting webcam access...');
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error(
-          'Webcam API is not supported in this browser. Please use Chrome, Edge, Safari, or Firefox over HTTPS or localhost.'
+          'Webcam API is not supported in this browser. Please ensure camera access is enabled.'
         );
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user',
-        },
-        audio: false,
-      });
+      // Clean up previous stream tracks first if any were running to release hardware
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+
+      // Step 1: Open user camera directly so user face shows immediately
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: 'user',
+          },
+          audio: false,
+        });
+      } catch (err1) {
+        console.warn('Preferred constraints failed, trying basic video:true', err1);
+        // Fallback to standard video constraint
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      }
 
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await new Promise<void>((resolve) => {
-          if (!videoRef.current) return resolve();
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current?.play().then(() => resolve()).catch(() => resolve());
-          };
-        });
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(() => {});
+        };
+        videoRef.current.play().catch(() => {});
       }
 
       setIsStreaming(true);
+
+      // Step 2: Initialize or connect MediaPipe AI model in background
+      if (!landmarkerRef.current) {
+        setIsLoadingModel(true);
+        setModelProgressText('Initializing MediaPipe AI hand tracking...');
+        initializeHandLandmarker((msg) => {
+          setModelProgressText(msg);
+        })
+          .then((landmarker) => {
+            landmarkerRef.current = landmarker;
+            setIsLoadingModel(false);
+            setModelProgressText('');
+          })
+          .catch((err) => {
+            console.error('HandLandmarker model init error:', err);
+            setIsLoadingModel(false);
+            setModelProgressText('');
+          });
+      }
     } catch (err: unknown) {
       console.error('Camera startup error:', err);
       let errorMsg = 'An unexpected error occurred while starting the camera.';
       if (err instanceof DOMException) {
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-          errorMsg =
-            'Camera permission was denied. Please click the lock or camera icon in your browser address bar, set Camera to "Allow", and reload.';
+          const isVSCode = window.parent !== window || navigator.userAgent.includes('Electron');
+          if (isVSCode) {
+            errorMsg =
+              'VS Code built-in browser blocks webcam access. Please click "Open in Chrome / Browser" to open http://localhost:3002 in Google Chrome or Microsoft Edge.';
+          } else {
+            errorMsg =
+              'Camera permission was denied. Please click the lock or camera icon in your browser address bar, set Camera to "Allow", and reload.';
+          }
         } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
           errorMsg = 'No video camera device was found on this computer or phone.';
         } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
