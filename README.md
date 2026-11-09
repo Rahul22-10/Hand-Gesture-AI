@@ -1,15 +1,22 @@
-# Hand Gesture AI
+# ✋ Hand Gesture AI
 
-An AI-powered web application for real-time hand gesture detection using a camera.
+An AI-powered web application for real-time hand gesture recognition using computer vision and your device's camera.
 
-## Features
+## 🌐 Live Demo
 
-- Real-time hand gesture detection
+🚀 **[Open Hand Gesture AI](https://hand-gesture-ai-gamma.vercel.app/)**
+
+## ✨ Features
+
+- Real-time hand gesture recognition
 - Camera-based interaction
 - Hand landmark tracking
 - Interactive user interface
+- 3D gesture visualization
+- Gesture history
+- User profile interface
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 - React
 - TypeScript
@@ -17,7 +24,7 @@ An AI-powered web application for real-time hand gesture detection using a camer
 - MediaPipe Tasks Vision
 - CSS
 
-## Run Locally
+## 🚀 Run Locally
 
 ### Prerequisites
 
@@ -26,32 +33,47 @@ An AI-powered web application for real-time hand gesture detection using a camer
 
 ### Installation
 
-1. Install dependencies:
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Rahul22-10/Hand-Gesture-AI.git
+   ```
+
+2. Open the project folder:
+
+   ```bash
+   cd Hand-Gesture-AI
+   ```
+
+3. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the development server:
+4. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-3. Open the local URL shown in your terminal.
+5. Open the local URL displayed in your terminal.
 
-4. 🌐 Live Demo
+## 🔐 Security
 
-Try Hand Gesture AI Live:
-🚀 Open Live Website
-https://hand-gesture-ai-gamma.vercel.app/
+- Never upload `.env` files or API keys to GitHub.
+- Use `.env.example` to document required environment variables.
 
+## 👨‍💻 Developer
 
+**Rahul Prajapati**
 
+GitHub: [@Rahul22-10](https://github.com/Rahul22-10)
 
-## Security
+---
 
-Do not upload `.env` files or API keys to GitHub. Use `.env.example` to document required environment variables without exposing secrets.
+⭐ If you like this project, consider giving it a star!
+
 
 
 
